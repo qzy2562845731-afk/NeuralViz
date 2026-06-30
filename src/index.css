@@ -1,0 +1,372 @@
+/* ============================================
+   Neural Training — Minimal Index CSS
+   仅保留 SVG 可视化 + 布局所需的定制样式
+   所有通用 UI 由 shadcn/Tailwind 处理
+   ============================================ */
+
+@reference "tailwindcss";
+
+/* ---- 页面容器 ---- */
+.app-container {
+  @apply flex min-h-screen flex-col;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.app-main {
+  @apply flex flex-1 flex-col gap-6 px-6 pb-10;
+  @apply mx-auto w-full;
+  max-width: 1520px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---- Header ---- */
+.dashboard-header {
+  @apply sticky top-0 z-50 flex h-16 items-center justify-between;
+  @apply border-b bg-background/80 px-6 backdrop-blur-xl;
+  animation: slideDown 0.45s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.header-logo svg {
+  @apply size-9 text-primary;
+  filter: drop-shadow(0 0 6px oklch(0.72 0.12 200 / 0.35));
+}
+
+.header-step {
+  @apply absolute left-1/2 flex -translate-x-1/2 items-center gap-2;
+  @apply rounded-full border bg-muted/50 px-5 py-2;
+  @apply font-mono text-sm text-primary tabular-nums;
+}
+
+/* ---- 三列网格 ---- */
+.main-grid {
+  @apply grid gap-6;
+  grid-template-columns: 280px minmax(0, 1fr) 320px;
+}
+
+@media (max-width: 1279px) {
+  .main-grid {
+    grid-template-columns: 260px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 959px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- 侧边栏 ---- */
+.left-sidebar,
+.right-sidebar {
+  @apply flex flex-col gap-4;
+}
+
+.center-content {
+  @apply flex flex-col gap-4;
+  min-width: 0;
+}
+
+/* ---- 底部网格 ---- */
+.bottom-section {
+  @apply mt-1;
+}
+
+.bottom-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+}
+
+@media (max-width: 959px) {
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- 面板标题 ---- */
+.panel-label {
+  @apply mb-3 font-mono text-[11px] font-medium uppercase tracking-wider text-muted-foreground;
+}
+
+/* ---- 指标数值 ---- */
+.metric-row {
+  @apply flex items-center justify-between border-b py-2;
+  @apply border-border text-sm;
+}
+
+.metric-row:last-child {
+  border-bottom: none;
+}
+
+.metric-name {
+  @apply text-muted-foreground;
+}
+
+.metric-value {
+  @apply font-mono text-sm font-semibold tabular-nums;
+}
+
+.metric-value.loss { @apply text-chart-5; }
+.metric-value.accuracy { @apply text-chart-1; }
+.metric-value.precision { @apply text-chart-3; }
+.metric-value.recall { @apply text-chart-2; }
+.metric-value.f1 { @apply text-chart-1; }
+.metric-value.lr { @apply text-xs text-chart-4; }
+
+/* ---- 训练指标卡片 ---- */
+.metrics-grid {
+  @apply grid grid-cols-2 gap-3;
+}
+
+.metric-card-item {
+  @apply rounded-lg border bg-muted/30 p-3;
+  @apply flex flex-col gap-1;
+  transition: border-color 0.2s;
+}
+
+.metric-card-item:hover {
+  @apply border-border;
+}
+
+.metric-card-item .label {
+  @apply text-[10px] font-medium uppercase tracking-wider text-muted-foreground;
+}
+
+.metric-card-item .value {
+  @apply font-mono text-lg font-bold tabular-nums;
+}
+
+/* ---- 控件按钮 ---- */
+.play-btn {
+  @apply flex size-14 items-center justify-center rounded-full;
+  @apply bg-primary text-primary-foreground;
+  @apply transition-all duration-200;
+  box-shadow: 0 4px 20px oklch(0.72 0.12 200 / 0.3);
+}
+
+.play-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 6px 28px oklch(0.72 0.12 200 / 0.45);
+}
+
+.play-btn.playing {
+  @apply bg-destructive text-white;
+  box-shadow: 0 4px 20px oklch(0.55 0.18 20 / 0.3);
+}
+
+.ctrl-btn {
+  @apply flex size-11 items-center justify-center rounded-lg;
+  @apply border bg-muted/30 text-muted-foreground;
+  @apply transition-all duration-200;
+}
+
+.ctrl-btn:hover:not(:disabled) {
+  @apply border-border bg-muted text-foreground;
+}
+
+.ctrl-btn:disabled {
+  @apply opacity-30;
+}
+
+/* ---- 速度选择器 ---- */
+.speed-selector {
+  @apply flex items-center justify-between border-t pt-3;
+}
+
+.speed-option {
+  @apply rounded-lg border px-3 py-1.5 text-xs font-medium;
+  @apply text-muted-foreground transition-all duration-200;
+}
+
+.speed-option:hover {
+  @apply border-primary/40 text-foreground;
+}
+
+.speed-option.active {
+  @apply border-primary bg-primary/10 text-primary;
+}
+
+/* ---- 滑动条 ---- */
+.progress-slider {
+  @apply relative;
+}
+
+.progress-track {
+  @apply h-1.5 rounded-full bg-muted overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full rounded-full bg-primary;
+  transition: width 0.1s linear;
+}
+
+/* ---- 状态指示器 ---- */
+.status-indicator {
+  @apply flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs;
+  @apply text-muted-foreground transition-all;
+}
+
+.status-indicator.playing {
+  @apply border-primary/30 bg-primary/8 text-primary;
+}
+
+.status-indicator.completed {
+  @apply border-chart-2/30 bg-chart-2/8;
+  color: oklch(0.65 0.15 160);
+}
+
+.status-dot {
+  @apply size-2 rounded-full bg-muted-foreground transition-all;
+}
+
+.status-indicator.playing .status-dot {
+  @apply bg-primary;
+  box-shadow: 0 0 10px oklch(0.72 0.12 200 / 0.6);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.status-indicator.completed .status-dot {
+  background: oklch(0.65 0.15 160);
+  box-shadow: 0 0 10px oklch(0.65 0.15 160 / 0.5);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* ---- 完成横幅 ---- */
+.completion-notice {
+  @apply mt-4 flex items-center justify-center gap-2 rounded-lg;
+  @apply border border-chart-2/20 bg-chart-2/5 p-3 text-sm;
+  color: oklch(0.65 0.15 160);
+}
+
+/* ---- CNN 可视化 SVG ---- */
+.cnn-container {
+  @apply flex min-h-[480px] items-center justify-center;
+}
+
+.cnn-svg {
+  @apply h-auto w-full;
+  max-width: 760px;
+  min-height: 480px;
+}
+
+.connection-line {
+  transition: stroke-opacity 0.25s ease;
+}
+
+.node-circle {
+  transition: all 0.25s ease;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
+
+/* ---- Feature Map ---- */
+.heatmap-grid {
+  @apply grid grid-cols-4 gap-4;
+}
+
+@media (max-width: 959px) {
+  .heatmap-grid {
+    @apply grid-cols-3;
+  }
+}
+
+@media (max-width: 639px) {
+  .heatmap-grid {
+    @apply grid-cols-2;
+  }
+}
+
+.heatmap-svg {
+  @apply block rounded-md overflow-hidden;
+  @apply size-20;
+}
+
+/* ---- 混淆矩阵 ---- */
+.matrix-grid {
+  @apply flex flex-col gap-1;
+}
+
+.matrix-row {
+  @apply flex gap-1;
+}
+
+.matrix-cell {
+  @apply flex size-8 items-center justify-center rounded text-[10px];
+  @apply font-mono transition-transform;
+}
+
+.matrix-cell:hover {
+  transform: scale(1.12);
+}
+
+.matrix-label {
+  @apply w-8 text-center text-[10px] font-mono text-muted-foreground;
+}
+
+/* ---- 诊断 ---- */
+.diagnosis-item {
+  @apply rounded-lg border-l-3 p-3;
+}
+
+.diagnosis-item.good {
+  @apply border-chart-2 bg-chart-2/5;
+}
+
+.diagnosis-item.warning {
+  @apply border-chart-4 bg-chart-4/5;
+}
+
+.diagnosis-item.danger {
+  @apply border-destructive bg-destructive/5;
+}
+
+.diagnosis-item.info {
+  @apply border-primary bg-primary/5;
+}
+
+/* ---- 图表容器 ---- */
+.chart-wrapper {
+  @apply min-h-[280px];
+}
+
+.chart-wrapper-small {
+  @apply h-20 min-h-[80px];
+}
+
+.chart-wrapper-medium {
+  @apply h-60 min-h-[240px];
+}
+
+/* ---- 滚动条 ---- */
+::-webkit-scrollbar {
+  @apply size-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-muted;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/30;
+}
+
+/* ---- 3D 查看器 ---- */
+.cnn-3d-overlay {
+  @apply absolute bottom-5 left-5 flex gap-5;
+  @apply rounded-lg border bg-background/85 p-3 backdrop-blur-lg;
+}

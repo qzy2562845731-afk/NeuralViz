@@ -1,0 +1,1094 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: var(--font-sans);
+    --font-sans: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: 'Geist Mono Variable', ui-monospace, 'Cascadia Code', monospace;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Neural Dark — Restrained Product Theme
+   Scene: researcher at desk, dim warm lamp, late-night model debugging.
+   Single accent: viridian green, used for primary actions + active indicators.
+   Neutral ramp: monochromatic cool-gray, no warm tint creep. */
+:root {
+    --background: oklch(0.095 0.004 260);
+    --foreground: oklch(0.94 0.002 260);
+    --card: oklch(0.125 0.005 260);
+    --card-foreground: oklch(0.92 0.003 260);
+    --popover: oklch(0.145 0.006 260);
+    --popover-foreground: oklch(0.92 0.003 260);
+    --primary: oklch(0.68 0.16 155);
+    --primary-foreground: oklch(0.1 0.003 260);
+    --secondary: oklch(0.17 0.006 260);
+    --secondary-foreground: oklch(0.88 0.004 260);
+    --muted: oklch(0.15 0.005 260);
+    --muted-foreground: oklch(0.50 0.008 260);
+    --accent: oklch(0.18 0.030 155);
+    --accent-foreground: oklch(0.85 0.08 155);
+    --destructive: oklch(0.52 0.18 18);
+    --border: oklch(0.22 0.006 260);
+    --input: oklch(0.20 0.006 260);
+    --ring: oklch(0.68 0.16 155);
+    --chart-1: oklch(0.68 0.16 155);
+    --chart-2: oklch(0.72 0.12 230);
+    --chart-3: oklch(0.70 0.14 180);
+    --chart-4: oklch(0.62 0.16 45);
+    --chart-5: oklch(0.58 0.18 12);
+    --radius: 0.5rem;
+    --sidebar: oklch(0.11 0.004 260);
+    --sidebar-foreground: oklch(0.92 0.003 260);
+    --sidebar-primary: oklch(0.68 0.16 155);
+    --sidebar-primary-foreground: oklch(0.1 0.003 260);
+    --sidebar-accent: oklch(0.17 0.006 260);
+    --sidebar-accent-foreground: oklch(0.88 0.004 260);
+    --sidebar-border: oklch(0.22 0.006 260);
+    --sidebar-ring: oklch(0.68 0.16 155);
+}
+
+.dark {
+    --background: oklch(0.095 0.004 260);
+    --foreground: oklch(0.94 0.002 260);
+    --card: oklch(0.125 0.005 260);
+    --card-foreground: oklch(0.92 0.003 260);
+    --popover: oklch(0.145 0.006 260);
+    --popover-foreground: oklch(0.92 0.003 260);
+    --primary: oklch(0.68 0.16 155);
+    --primary-foreground: oklch(0.1 0.003 260);
+    --secondary: oklch(0.17 0.006 260);
+    --secondary-foreground: oklch(0.88 0.004 260);
+    --muted: oklch(0.15 0.005 260);
+    --muted-foreground: oklch(0.50 0.008 260);
+    --accent: oklch(0.18 0.030 155);
+    --accent-foreground: oklch(0.85 0.08 155);
+    --destructive: oklch(0.52 0.18 18);
+    --border: oklch(0.22 0.006 260);
+    --input: oklch(0.20 0.006 260);
+    --ring: oklch(0.68 0.16 155);
+    --chart-1: oklch(0.68 0.16 155);
+    --chart-2: oklch(0.72 0.12 230);
+    --chart-3: oklch(0.70 0.14 180);
+    --chart-4: oklch(0.62 0.16 45);
+    --chart-5: oklch(0.58 0.18 12);
+    --sidebar: oklch(0.11 0.004 260);
+    --sidebar-foreground: oklch(0.92 0.003 260);
+    --sidebar-primary: oklch(0.68 0.16 155);
+    --sidebar-primary-foreground: oklch(0.1 0.003 260);
+    --sidebar-accent: oklch(0.17 0.006 260);
+    --sidebar-accent-foreground: oklch(0.88 0.004 260);
+    --sidebar-border: oklch(0.22 0.006 260);
+    --sidebar-ring: oklch(0.68 0.16 155);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  /* Subtle ambient light — single radial source, no stripes */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 50% at 30% 20%, oklch(0.68 0.16 155 / 0.025) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, oklch(0.58 0.18 12 / 0.012) 0%, transparent 50%);
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* ============================================
+   Neural Training — Custom UI Styles
+   All base UI handled by shadcn/Tailwind
+   Only SVG visualization + layout + component-specific customizations
+   ============================================ */
+
+@layer components {
+  .app-container {
+    @apply flex min-h-screen flex-col;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .app-main {
+    @apply flex flex-1 flex-col gap-6 px-6 pb-10 mx-auto w-full;
+    max-width: 1520px;
+  }
+
+  .dashboard-header {
+    @apply sticky top-0 z-50 flex h-16 items-center justify-between;
+    @apply border-b bg-background/90 px-6 backdrop-blur-md;
+    animation: slideDown 0.45s ease-out;
+  }
+
+  .header-logo svg {
+    @apply size-9 text-primary;
+    filter: drop-shadow(0 0 6px oklch(0.68 0.16 155 / 0.35));
+  }
+
+  .header-step {
+    @apply absolute left-1/2 flex -translate-x-1/2 items-center gap-2;
+    @apply rounded-full border bg-muted/50 px-5 py-2;
+    @apply font-mono text-sm text-primary tabular-nums;
+  }
+
+  .main-grid {
+    @apply grid gap-6;
+    grid-template-columns: 280px minmax(0, 1fr) 320px;
+  }
+
+  .left-sidebar, .right-sidebar {
+    @apply flex flex-col gap-4;
+  }
+
+  .center-content {
+    @apply flex flex-col gap-4;
+    min-width: 0;
+  }
+
+  .bottom-section { @apply mt-1; }
+
+  .bottom-grid {
+    @apply grid gap-6;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  }
+
+  .panel-label {
+    @apply mb-3 font-mono text-[11px] font-medium text-muted-foreground;
+  }
+
+  .metric-row {
+    @apply flex items-center justify-between border-b py-2 border-border text-sm;
+  }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-name { @apply text-muted-foreground; }
+  .metric-value { @apply font-mono text-sm font-semibold tabular-nums; }
+  .metric-value.loss { @apply text-chart-5; }
+  .metric-value.accuracy { @apply text-chart-1; }
+  .metric-value.precision { @apply text-chart-3; }
+  .metric-value.recall { @apply text-chart-2; }
+  .metric-value.f1 { @apply text-chart-1; }
+  .metric-value.lr { @apply text-xs text-chart-4; }
+
+  .metrics-grid { @apply grid grid-cols-2 gap-3; }
+  .metric-card-item {
+    @apply rounded-lg border bg-muted/30 p-3 flex flex-col gap-1;
+    transition: border-color 0.2s;
+  }
+  .metric-card-item:hover { @apply border-border; }
+  .metric-card-item .label {
+    @apply text-[10px] font-medium uppercase tracking-wider text-muted-foreground;
+  }
+  .metric-card-item .value {
+    @apply font-mono text-lg font-bold tabular-nums;
+  }
+
+  .play-btn {
+    @apply flex size-14 items-center justify-center rounded-full;
+    @apply bg-primary text-primary-foreground transition-all duration-200;
+    box-shadow: 0 4px 20px oklch(0.68 0.16 155 / 0.35);
+  }
+  .play-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 32px oklch(0.68 0.16 155 / 0.5);
+  }
+  .play-btn:active { transform: scale(0.95); }
+  .play-btn.playing {
+    @apply bg-destructive;
+    color: #fff;
+    box-shadow: 0 4px 20px oklch(0.52 0.18 18 / 0.35);
+  }
+
+  .ctrl-btn {
+    @apply flex size-11 items-center justify-center rounded-lg;
+    @apply border bg-muted/30 text-muted-foreground transition-all duration-200;
+  }
+  .ctrl-btn:hover:not(:disabled) {
+    @apply border-border bg-muted text-foreground;
+  }
+  .ctrl-btn:disabled { @apply opacity-30; }
+
+  .speed-selector {
+    @apply flex items-center justify-between border-t pt-3;
+  }
+  .speed-option {
+    @apply rounded-lg border px-3 py-1.5 text-xs font-medium;
+    @apply text-muted-foreground transition-all duration-200;
+  }
+  .speed-option:hover { @apply border-primary/40 text-foreground; }
+  .speed-option.active { @apply border-primary bg-primary/10 text-primary; }
+
+  .progress-slider { @apply relative; }
+  .progress-track { @apply h-1.5 rounded-full bg-muted overflow-hidden; }
+  .progress-fill {
+    @apply h-full rounded-full bg-primary;
+    transition: width 0.1s linear;
+  }
+
+  .status-indicator {
+    @apply flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs;
+    @apply text-muted-foreground transition-all;
+  }
+  .status-indicator.playing { @apply border-primary/30 bg-primary/8 text-primary; }
+  .status-indicator.completed {
+    @apply border-chart-2/30 bg-chart-2/8;
+    color: oklch(0.68 0.16 155);
+  }
+  .status-dot { @apply size-2 rounded-full bg-muted-foreground transition-all; }
+  .status-indicator.playing .status-dot {
+    @apply bg-primary;
+    box-shadow: 0 0 12px oklch(0.68 0.16 155 / 0.7);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .status-indicator.completed .status-dot {
+    background: oklch(0.68 0.16 155);
+    box-shadow: 0 0 10px oklch(0.68 0.16 155 / 0.5);
+  }
+
+  .completion-notice {
+    @apply mt-4 flex items-center justify-center gap-2 rounded-lg;
+    @apply border border-chart-2/20 bg-chart-2/5 p-3 text-sm;
+    color: oklch(0.68 0.16 155);
+  }
+
+  .cnn-container { @apply flex items-center justify-center; }
+  .cnn-svg {
+    @apply w-full;
+    max-width: 760px;
+    height: auto;
+  }
+  .connection-line { transition: stroke-opacity 0.25s ease; }
+  .node-circle {
+    transition: all 0.25s ease;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+  }
+
+  .heatmap-grid { @apply grid grid-cols-4 gap-4; }
+  .heatmap-svg { @apply block rounded-md overflow-hidden size-20; }
+
+  .matrix-grid { @apply flex flex-col gap-1; }
+  .matrix-row { @apply flex gap-1; }
+  .matrix-cell {
+    @apply flex size-8 items-center justify-center rounded text-[10px];
+    @apply font-mono transition-transform;
+  }
+  .matrix-cell:hover { transform: scale(1.12); }
+  .matrix-label { @apply w-8 text-center text-[10px] font-mono text-muted-foreground; }
+
+  .diagnosis-item { @apply rounded-lg border border-border/50 p-3; }
+  .diagnosis-item.good { @apply border-chart-2/40 bg-chart-2/5; }
+  .diagnosis-item.warning { @apply border-chart-4/40 bg-chart-4/5; }
+  .diagnosis-item.danger { @apply border-destructive/40 bg-destructive/5; }
+  .diagnosis-item.info { @apply border-primary/40 bg-primary/5; }
+
+  .chart-wrapper { @apply min-h-[280px]; }
+  .chart-wrapper-small { @apply h-20 min-h-[80px]; }
+  .chart-wrapper-medium { @apply h-60 min-h-[240px]; }
+
+  .cnn-3d-overlay {
+    @apply absolute bottom-5 left-5 flex gap-5;
+    @apply rounded-lg border border-border/50 bg-background/85 p-3 backdrop-blur-md;
+  }
+
+  /* ===== StepInfo 组件 ===== */
+  .card {
+    @apply rounded-lg border border-border/50 bg-card p-5;
+    @apply transition-shadow duration-200;
+  }
+  .card:hover {
+    @apply border-border/80;
+  }
+  .card-header {
+    @apply flex items-center justify-between border-b border-border pb-3 mb-3;
+  }
+  .card-title {
+    @apply text-sm font-medium tracking-tight text-foreground;
+  }
+  .card-subtitle { @apply text-xs text-muted-foreground; }
+  .step-badge {
+    @apply rounded-full border border-primary/20 bg-primary/8 px-2.5 py-1;
+    @apply font-mono text-xs text-primary;
+  }
+  .empty-state {
+    @apply flex items-center justify-center py-10 text-sm text-muted-foreground;
+  }
+  .step-info { @apply flex flex-col gap-3; }
+  .activation-section { @apply mt-2; }
+  .section-title {
+    @apply mb-2 text-xs font-medium text-muted-foreground;
+  }
+  .activation-list { @apply flex flex-col gap-2; }
+  .layer-stat-card {
+    @apply rounded-md border border-border bg-muted/20 p-3;
+  }
+  .layer-stat-header {
+    @apply flex items-center gap-2 mb-2;
+  }
+  .layer-indicator {
+    @apply size-2 rounded-full;
+  }
+  .layer-name { @apply text-xs font-medium text-foreground; }
+  .layer-stat-grid {
+    @apply grid grid-cols-2 gap-2;
+  }
+  .stat-item { @apply flex flex-col; }
+  .stat-label { @apply text-[10px] text-muted-foreground; }
+
+  .metric-card {
+    @apply rounded-md border border-border/50 bg-muted/20 p-3 flex flex-col gap-1;
+  }
+  .metric-card.loss { @apply border-chart-5/30; }
+  .metric-card.loss-val { @apply border-chart-4/30; }
+  .metric-card.accuracy { @apply border-chart-1/30; }
+  .metric-card.accuracy-val { @apply border-chart-2/30; }
+  .metric-card.lr { @apply col-span-2 border-primary/30; }
+  .metric-label {
+    @apply text-[10px] font-medium text-muted-foreground;
+  }
+  .metric-value { @apply font-mono text-lg font-bold tabular-nums; }
+  .metric-card.loss .metric-value { @apply text-chart-5; }
+  .metric-card.loss-val .metric-value { @apply text-chart-4; }
+  .metric-card.accuracy .metric-value { @apply text-chart-1; }
+  .metric-card.accuracy-val .metric-value { @apply text-chart-2; }
+  .metric-value.lr-value { @apply text-base text-primary; }
+
+  /* ===== ModelMetrics 组件 ===== */
+  .model-metrics-panel { @apply flex flex-col gap-3; }
+  .metrics-grid-full { @apply flex flex-col gap-3; }
+  .metric-section { @apply flex flex-col gap-1.5; }
+  .metric-section-title {
+    @apply text-[10px] font-medium text-muted-foreground;
+  }
+  .metric-row {
+    @apply flex items-center justify-between py-1.5;
+  }
+  .metric-name { @apply text-xs text-muted-foreground; }
+  .metric-number {
+    @apply font-mono text-sm font-semibold tabular-nums;
+  }
+  .metric-number.loss { @apply text-chart-5; }
+  .metric-number.loss-val { @apply text-chart-4; }
+  .metric-number.accuracy { @apply text-chart-1; }
+  .metric-number.accuracy-val { @apply text-chart-2; }
+  .metric-number.precision { color: oklch(0.72 0.12 230); }
+  .metric-number.recall { color: oklch(0.70 0.14 180); }
+  .metric-number.f1 { @apply text-chart-1; }
+  .metric-number.lr { @apply text-xs text-primary; }
+  .metric-number.grad { @apply text-chart-4; }
+  .metric-number.weight { color: oklch(0.72 0.12 230); }
+  .metric-divider { @apply my-1 border-t border-border; }
+  .hint-item {
+    @apply flex items-start gap-2 py-1.5;
+  }
+  .hint-item.good .hint-icon {
+    @apply flex size-4 items-center justify-center rounded-full text-[10px];
+    @apply bg-chart-2/15;
+    color: oklch(0.68 0.16 155);
+  }
+  .hint-item.warning .hint-icon {
+    @apply flex size-4 items-center justify-center rounded-full text-[10px];
+    @apply bg-chart-4/15;
+    color: oklch(0.62 0.16 45);
+  }
+  .hint-item.info .hint-icon {
+    @apply flex size-4 items-center justify-center rounded-full text-[10px];
+    @apply bg-primary/15 text-primary;
+  }
+  .hint-text { @apply text-xs text-muted-foreground; }
+
+  /* ===== TrainingCurves 组件 ===== */
+  .training-curves-panel { @apply flex flex-col gap-3; }
+  .chart-info { @apply font-mono text-[11px] text-muted-foreground; }
+
+  /* ===== DownloadButton 组件 ===== */
+  .download-btn {
+    @apply flex items-center gap-2 rounded-lg border px-3 py-2;
+    @apply text-xs text-muted-foreground transition-all duration-200;
+  }
+  .download-btn:hover:not(:disabled) {
+    @apply border-primary/30 text-foreground;
+  }
+  .download-btn:disabled { @apply opacity-50; }
+  .download-btn svg { @apply size-4; }
+  .download-label { @apply text-xs font-medium; }
+  .spin { animation: spin 1s linear infinite; }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* ===== ViewModeSelector 组件 ===== */
+  .view-mode-selector { @apply relative; }
+  .view-mode-toggle {
+    @apply flex items-center gap-2 rounded-lg border px-3 py-2;
+    @apply text-xs text-muted-foreground transition-all duration-200;
+  }
+  .view-mode-toggle:hover { @apply border-primary/30 text-foreground; }
+  .view-mode-toggle.active { @apply border-primary/30 bg-primary/8 text-primary; }
+  .view-mode-toggle svg { @apply size-4; }
+  .view-mode-label { @apply text-xs font-medium; }
+  .view-mode-dropdown {
+    @apply absolute right-0 top-full z-50 mt-1 min-w-[180px];
+    @apply rounded-lg border border-border bg-card p-2 shadow-lg;
+  }
+  .view-mode-option {
+    @apply flex w-full items-center gap-2 rounded-md px-3 py-2;
+    @apply text-xs text-muted-foreground transition-all duration-150;
+  }
+  .view-mode-option:hover { @apply bg-muted/50 text-foreground; }
+  .view-mode-option.active { @apply bg-primary/8 text-primary; }
+  .view-mode-option-icon svg { @apply size-4; }
+  .view-mode-option-label { @apply flex-1 text-left; }
+  .view-mode-active-indicator { @apply text-xs text-primary; }
+
+  /* ===== LayoutControl 组件 ===== */
+  .layout-control { @apply relative; }
+  .layout-toggle-btn {
+    @apply flex items-center gap-2 rounded-lg border px-3 py-2;
+    @apply text-xs text-muted-foreground transition-all duration-200;
+  }
+  .layout-toggle-btn:hover { @apply border-primary/30 text-foreground; }
+  .layout-toggle-btn.active { @apply border-primary/30 bg-primary/8 text-primary; }
+  .layout-toggle-btn svg { @apply size-4; }
+  .layout-toggle-label { @apply text-xs font-medium; }
+  .layout-count { @apply font-mono text-[10px] text-muted-foreground; }
+  .layout-dropdown {
+    @apply absolute right-0 top-full z-50 mt-1 min-w-[260px];
+    @apply rounded-lg border border-border bg-card p-4 shadow-lg;
+  }
+  .layout-dropdown-header {
+    @apply flex items-center justify-between mb-3;
+  }
+  .layout-dropdown-header h3 {
+    @apply text-xs font-medium text-foreground;
+  }
+  .layout-info { @apply text-[10px] text-muted-foreground; }
+  .layout-sections { @apply flex flex-col gap-1; }
+  .layout-section-item {
+    @apply flex items-center gap-2 rounded-md px-2 py-2;
+    @apply cursor-pointer transition-colors;
+  }
+  .layout-section-item:hover { @apply bg-muted/30; }
+  .section-icon svg { @apply size-4; }
+  .section-icon { @apply text-muted-foreground; }
+  .section-label { @apply flex-1 text-xs text-muted-foreground; }
+  .section-toggle { @apply relative; }
+  .toggle-track {
+    @apply relative flex h-5 w-9 cursor-pointer items-center rounded-full;
+    @apply bg-muted transition-colors;
+  }
+  .section-toggle.on .toggle-track { @apply bg-primary; }
+  .toggle-thumb {
+    @apply absolute left-0.5 size-4 rounded-full bg-white transition-transform;
+  }
+  .section-toggle.on .toggle-thumb {
+    transform: translateX(calc(2.25rem - 1.25rem));
+  }
+  .layout-actions {
+    @apply mt-3 flex gap-2 border-t border-border pt-3;
+  }
+  .layout-action-btn {
+    @apply flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5;
+    @apply border border-border text-[10px] text-muted-foreground;
+    @apply transition-all duration-200;
+  }
+  .layout-action-btn:hover { @apply border-primary/30 text-foreground; }
+  .layout-action-btn.active { @apply border-primary/30 bg-primary/8 text-primary; }
+  .layout-action-btn:disabled { @apply opacity-40; }
+  .layout-action-btn svg { @apply size-3.5; }
+
+  /* ===== ColorConfigPanel 组件 ===== */
+  .color-config { @apply relative; }
+  .color-toggle-btn {
+    @apply flex items-center gap-2 rounded-lg border border-border px-3 py-2;
+    @apply text-xs text-muted-foreground transition-all duration-200;
+  }
+  .color-toggle-btn:hover { @apply border-primary/40 text-foreground bg-muted/30; }
+  .color-toggle-btn.active { @apply border-primary/40 bg-primary/8 text-primary; }
+  .color-toggle-btn svg { @apply size-4; }
+  .color-toggle-label { @apply text-xs font-medium; }
+  .color-panel {
+    @apply absolute right-0 top-full z-50 mt-1.5 w-[340px];
+    @apply rounded-xl border border-border bg-card shadow-2xl shadow-black/30;
+    @apply max-h-[70vh] overflow-y-auto p-4;
+    animation: dropdownIn 0.18s ease-out;
+  }
+  @keyframes dropdownIn {
+    from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .color-panel-header {
+    @apply flex items-center justify-between mb-3 pb-3 border-b border-border;
+  }
+  .color-panel-header h3 {
+    @apply text-sm font-semibold text-foreground tracking-tight;
+  }
+  .color-panel-footer {
+    @apply mt-3 pt-3 border-t border-border;
+  }
+  .current-preset {
+    @apply text-[10px] text-muted-foreground;
+  }
+  .current-preset strong { @apply text-primary font-semibold; }
+  .color-sections { @apply flex flex-col gap-4; }
+  .color-section { @apply flex flex-col gap-2; }
+  .color-section h4 {
+    @apply text-[10px] font-semibold text-muted-foreground;
+  }
+  .color-item { @apply flex flex-col gap-1.5; }
+  .color-label {
+    @apply text-[10px] font-medium text-muted-foreground;
+  }
+  .color-input-group {
+    @apply flex items-center gap-2;
+  }
+  .color-preview {
+    @apply flex size-8 items-center justify-center rounded-md border border-border;
+    @apply cursor-pointer transition-shadow;
+  }
+  .color-preview:hover { box-shadow: 0 0 12px currentColor; }
+  .color-preview svg { @apply size-4 opacity-70; }
+  .color-picker {
+    @apply size-8 cursor-pointer rounded-md border border-border;
+    @apply bg-transparent transition-shadow;
+  }
+  .color-picker:hover { box-shadow: 0 0 10px rgba(0,0,0,0.3); }
+  .color-picker.small { @apply size-6 rounded; }
+  .color-value {
+    @apply flex-1 rounded-md border border-border bg-muted/30 px-2 py-1.5;
+    @apply font-mono text-[11px] text-foreground;
+  }
+  .color-layer-inputs { @apply flex flex-wrap gap-2; }
+  .layer-color-wrapper {
+    @apply flex flex-col items-center gap-1;
+  }
+  .layer-index {
+    @apply text-[9px] font-mono text-muted-foreground;
+  }
+  .status-colors-preview {
+    @apply flex flex-col gap-1.5 mb-2;
+  }
+  .status-color-item {
+    @apply flex items-center gap-2 rounded-md px-2.5 py-1.5;
+    @apply border border-border/30 bg-muted/20;
+  }
+  .status-color-item .status-dot {
+    @apply size-2.5 rounded-full;
+    background: var(--status-color, #888);
+  }
+  .status-color-item .status-text {
+    @apply text-xs text-muted-foreground;
+  }
+  .color-restore-btn {
+    @apply flex w-full items-center justify-center gap-2 rounded-lg;
+    @apply border border-border px-3 py-2.5 text-xs font-medium text-muted-foreground;
+    @apply transition-all duration-200 hover:border-primary/30 hover:text-foreground hover:bg-muted/20;
+  }
+  .color-restore-btn svg { @apply size-4; }
+  .color-presets { @apply mb-4; }
+  .color-presets h4 {
+    @apply mb-2 text-[10px] font-semibold text-muted-foreground;
+  }
+  .presets-grid { @apply grid grid-cols-3 gap-2; }
+  .preset-preview {
+    @apply flex flex-col items-center gap-1.5 rounded-lg border border-border p-2.5;
+    @apply cursor-pointer transition-all duration-200 bg-transparent;
+    @apply hover:border-primary/30 hover:bg-muted/20;
+  }
+  .preset-preview.active { @apply border-primary/40 bg-primary/8 ring-1 ring-primary/15; }
+  .preset-colors { @apply flex gap-1; }
+  .preset-color { @apply size-3.5 rounded-sm; }
+  .preset-name { @apply text-[10px] text-muted-foreground font-medium; }
+  .preset-preview.active .preset-name { @apply text-primary; }
+  .preset-active-badge {
+    @apply text-[8px] text-primary font-semibold;
+    background: oklch(0.68 0.16 155 / 0.15);
+    @apply rounded-full px-1.5 py-0.5;
+  }
+
+  /* ===== CNN3DViewer 组件 ===== */
+  .cnn-3d-viewer {
+    @apply relative flex min-h-[600px] w-full flex-col overflow-hidden rounded-xl border border-border/50 bg-card;
+    cursor: grab;
+  }
+  .cnn-3d-viewer:active { cursor: grabbing; }
+  .cnn-3d-viewer .card-header {
+    @apply flex shrink-0 items-center justify-between border-b border-border/50 px-5 py-3;
+  }
+  .cnn-3d-container {
+    @apply relative flex flex-1 overflow-hidden;
+    min-height: 500px;
+  }
+  .cnn-3d-canvas {
+    @apply relative h-full w-full;
+  }
+  
+  /* 加载状态 */
+  .cnn-3d-loading {
+    @apply absolute inset-0 flex items-center justify-center bg-muted/10;
+    z-index: 20;
+  }
+  .cnn-3d-loading-content {
+    @apply flex flex-col items-center gap-3;
+  }
+  .cnn-3d-loading-spinner {
+    @apply size-8 rounded-full border-2 border-muted border-t-primary;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .cnn-3d-loading-text {
+    @apply text-sm font-medium text-muted-foreground;
+  }
+  
+  /* 错误状态 */
+  .cnn-3d-error {
+    @apply absolute inset-0 flex items-center justify-center bg-destructive/5;
+    z-index: 20;
+  }
+  .cnn-3d-error-content {
+    @apply flex flex-col items-center gap-2 rounded-lg border border-destructive/30 bg-card/95 p-6;
+  }
+  .cnn-3d-error-icon {
+    @apply text-3xl;
+  }
+  .cnn-3d-error-text {
+    @apply text-base font-semibold text-destructive;
+  }
+  .cnn-3d-error-detail {
+    @apply max-w-xs text-center text-xs text-muted-foreground;
+  }
+  
+  /* 成功状态的覆盖层 */
+  .cnn-3d-overlay {
+    @apply absolute bottom-4 left-4 z-10 flex items-center gap-4;
+    @apply rounded-lg border border-border/50 bg-background/90 px-4 py-2 backdrop-blur-md;
+  }
+  .cnn-3d-step {
+    @apply font-mono text-sm font-semibold text-primary tabular-nums;
+  }
+  .cnn-3d-status { @apply text-xs font-medium text-foreground; }
+  .cnn-3d-hint { @apply text-xs text-muted-foreground; }
+  .cnn-3d-selected-badge {
+    @apply absolute bottom-4 right-4 z-10;
+    @apply rounded-full border border-primary/30 bg-primary/10 px-4 py-2;
+    @apply text-sm font-medium text-primary;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  /* ===== LayerInspector 组件 ===== */
+  .inspector-card {
+    @apply flex flex-col gap-4;
+  }
+  .inspector-card-title-group {
+    @apply flex items-center gap-2;
+  }
+  .inspector-health-dot {
+    @apply size-3 rounded-full;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .inspector-summary {
+    @apply grid grid-cols-3 gap-2;
+  }
+  .inspector-summary-item {
+    @apply flex flex-col gap-1 rounded-md border border-border/50 bg-muted/20 p-2;
+  }
+  .inspector-summary-label {
+    @apply text-[10px] font-medium uppercase tracking-wider text-muted-foreground;
+  }
+  .inspector-summary-value {
+    @apply font-mono text-sm font-semibold tabular-nums;
+  }
+  .inspector-activation-section {
+    @apply flex flex-col gap-2;
+  }
+  .inspector-section-label {
+    @apply text-xs font-medium text-muted-foreground;
+  }
+  .inspector-range-bar {
+    @apply relative h-2 w-full overflow-hidden rounded-full bg-muted/30;
+  }
+  .inspector-range-fill {
+    @apply absolute top-0 h-full rounded-full transition-all duration-300;
+  }
+  .inspector-range-labels {
+    @apply flex items-center justify-between;
+    @apply font-mono text-[10px] text-muted-foreground tabular-nums;
+  }
+  .inspector-detail-section {
+    @apply flex flex-col gap-2;
+  }
+  .inspector-detail-grid {
+    @apply grid grid-cols-1 gap-2;
+  }
+  .inspector-detail-item {
+    @apply flex items-center justify-between rounded-md border border-border/50 bg-muted/20 px-3 py-2;
+  }
+  .inspector-detail-label {
+    @apply text-xs text-muted-foreground;
+  }
+  .inspector-detail-value {
+    @apply font-mono text-sm font-semibold tabular-nums;
+  }
+  .inspector-step-indicator {
+    @apply flex items-center justify-between rounded-lg border border-border/50 bg-muted/10 px-3 py-2;
+  }
+  .inspector-step-label {
+    @apply text-xs text-muted-foreground;
+  }
+  .inspector-step-value {
+    @apply font-mono text-sm font-semibold text-primary tabular-nums;
+  }
+  .inspector-overview {
+    @apply flex flex-col gap-2;
+  }
+  .inspector-overview-row {
+    @apply grid grid-cols-3 gap-2;
+  }
+  .inspector-overview-item {
+    @apply flex flex-col gap-1 rounded-md border border-border/50 bg-muted/20 p-2;
+  }
+  .inspector-overview-label {
+    @apply text-[10px] font-medium uppercase tracking-wider text-muted-foreground;
+  }
+  .inspector-overview-value {
+    @apply font-mono text-sm font-semibold tabular-nums;
+  }
+  .inspector-overview-value.loss { @apply text-chart-5; }
+  .inspector-overview-value.accuracy { @apply text-chart-1; }
+  .inspector-overfit-warning {
+    @apply flex items-center gap-2 rounded-md border border-chart-5/30 bg-chart-5/5 px-3 py-2;
+    @apply text-xs text-chart-5;
+  }
+  .inspector-warning-icon {
+    @apply flex size-4 items-center justify-center rounded-full bg-chart-5/20;
+    @apply text-[10px] font-bold;
+  }
+  .inspector-architecture {
+    @apply flex flex-col gap-2;
+  }
+  .inspector-layer-list {
+    @apply flex flex-col gap-1;
+  }
+  .inspector-layer-row {
+    @apply flex items-center gap-3 rounded-md border border-border/30 bg-muted/10 px-3 py-2;
+    @apply cursor-pointer transition-all duration-150;
+  }
+  .inspector-layer-row:hover {
+    @apply border-border/60 bg-muted/25;
+  }
+  .inspector-layer-index {
+    @apply flex size-5 items-center justify-center rounded-full bg-muted/30;
+    @apply font-mono text-[10px] font-medium text-muted-foreground;
+  }
+  .inspector-layer-info {
+    @apply flex flex-1 flex-col;
+  }
+  .inspector-layer-name {
+    @apply text-xs font-medium text-foreground;
+  }
+  .inspector-layer-desc {
+    @apply text-[10px] text-muted-foreground;
+  }
+  .inspector-layer-shape {
+    @apply font-mono text-[10px] text-muted-foreground;
+  }
+  .inspector-footer-hint {
+    @apply mt-auto text-center text-xs text-muted-foreground;
+  }
+  .badge {
+    @apply rounded-full border px-2.5 py-0.5 text-xs font-medium;
+  }
+  .badge-input { @apply border-primary/30 bg-primary/8 text-primary; }
+  .badge-conv1, .badge-conv2, .badge-conv { @apply border-chart-1/30 bg-chart-1/8 text-chart-1; }
+  .badge-fc { @apply border-chart-3/30 bg-chart-3/8 text-chart-3; }
+  .badge-output { @apply border-chart-2/30 bg-chart-2/8 text-chart-2; }
+
+  /* ===== SplitView 组件 ===== */
+  .split-view {
+    @apply flex h-full flex-col overflow-hidden;
+  }
+  .split-view-header {
+    @apply flex items-center justify-between border-b border-border/50 bg-muted/10 px-6 py-4;
+  }
+  .split-view-title {
+    @apply flex flex-col gap-1;
+  }
+  .split-view-title-text {
+    @apply text-lg font-semibold text-foreground;
+  }
+  .split-view-subtitle {
+    @apply text-xs text-muted-foreground;
+  }
+  .split-view-status {
+    @apply flex items-center gap-4;
+  }
+  .split-view-progress {
+    @apply flex items-center gap-3;
+  }
+  .split-view-progress-bar {
+    @apply h-1.5 w-32 overflow-hidden rounded-full bg-muted/30;
+  }
+  .split-view-progress-fill {
+    @apply h-full rounded-full bg-primary transition-all duration-300;
+  }
+  .split-view-progress-text {
+    @apply font-mono text-xs text-muted-foreground tabular-nums;
+  }
+  .split-view-status-badge {
+    @apply flex items-center gap-2 rounded-full border px-3 py-1.5;
+    @apply text-xs font-medium transition-all;
+  }
+  .split-view-status-badge.playing {
+    @apply border-primary/30 bg-primary/8 text-primary;
+  }
+  .split-view-status-badge.idle {
+    @apply border-border text-muted-foreground;
+  }
+  .split-view-status-dot {
+    @apply size-2 rounded-full;
+  }
+  .split-view-status-badge.playing .split-view-status-dot {
+    @apply bg-primary;
+    box-shadow: 0 0 8px oklch(0.68 0.16 155 / 0.6);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .split-view-status-badge.idle .split-view-status-dot {
+    @apply bg-muted-foreground;
+  }
+  .split-view-content {
+    @apply flex flex-1 overflow-hidden;
+  }
+  .split-view-primary {
+    @apply flex-1 overflow-hidden border-r border-border/50;
+  }
+  .split-view-secondary {
+    @apply flex w-[420px] shrink-0 flex-col gap-4 overflow-y-auto p-4;
+  }
+  .split-view-metrics {
+    @apply rounded-lg border border-border/50 bg-card p-4;
+  }
+  .split-view-metrics-header {
+    @apply mb-3 flex items-center justify-between;
+  }
+  .split-view-metrics-title {
+    @apply text-xs font-medium uppercase tracking-wider text-muted-foreground;
+  }
+  .split-view-metrics-speed {
+    @apply font-mono text-[10px] text-primary;
+  }
+  .split-view-metrics-grid {
+    @apply grid grid-cols-2 gap-2;
+  }
+  .split-view-metric-item {
+    @apply rounded-md border border-border/50 bg-muted/20 p-2.5;
+  }
+  .split-view-metric-label {
+    @apply block text-[10px] font-medium uppercase tracking-wider text-muted-foreground;
+  }
+  .split-view-metric-value {
+    @apply mt-1 block font-mono text-sm font-semibold tabular-nums;
+  }
+  .split-view-metric-value.loss { @apply text-chart-5; }
+  .split-view-metric-value.accuracy { @apply text-chart-1; }
+
+  /* 3D Tooltip */
+  .cnn-3d-tooltip {
+    @apply pointer-events-none absolute z-20;
+    @apply rounded-md border border-border/60 bg-background/95 px-3 py-1.5;
+    @apply text-xs font-medium text-foreground shadow-lg backdrop-blur-sm;
+    white-space: nowrap;
+  }
+
+  /* Clickable inspector layer rows */
+  .inspector-layer-row-clickable {
+    @apply cursor-pointer transition-all duration-150;
+  }
+  .inspector-layer-row-clickable:hover {
+    @apply border-border/60 bg-muted/25;
+  }
+
+  /* Inspector role section */
+  .inspector-role-section {
+    @apply border-b border-border/50 pb-3;
+  }
+  .inspector-role-text {
+    @apply text-sm text-foreground leading-relaxed;
+  }
+
+  /* Inspector architecture section */
+  .inspector-arch-section {
+    @apply border-b border-border/50 pb-3;
+  }
+  .inspector-arch-grid {
+    @apply grid grid-cols-2 gap-3;
+  }
+  .inspector-arch-item {
+    @apply flex flex-col gap-1 rounded-md border border-border/50 bg-muted/20 p-3;
+  }
+  .inspector-arch-label {
+    @apply text-[10px] font-medium uppercase tracking-wider text-muted-foreground;
+  }
+  .inspector-arch-value {
+    @apply font-mono text-sm font-semibold tabular-nums;
+  }
+
+  /* Inspector model summary */
+  .inspector-model-summary {
+    @apply border-b border-border/50 pb-3;
+  }
+  .inspector-model-stats {
+    @apply grid grid-cols-2 gap-3;
+  }
+  .inspector-model-stat {
+    @apply flex flex-col gap-1 rounded-md border border-border/50 bg-muted/20 p-3;
+  }
+  .inspector-model-stat-label {
+    @apply text-[10px] font-medium uppercase tracking-wider text-muted-foreground;
+  }
+  .inspector-model-stat-value {
+    @apply font-mono text-sm font-semibold tabular-nums;
+  }
+  
+  /* Status section */
+  .inspector-status-section {
+    @apply border-b border-border/50 pb-3;
+  }
+  .inspector-status-text {
+    @apply text-sm text-foreground leading-relaxed;
+  }
+
+  /* Inspector step badge */
+  .inspector-step-badge {
+    @apply rounded-full border border-primary/20 bg-primary/8 px-2.5 py-1;
+    @apply font-mono text-xs text-primary;
+  }
+
+  /* Inspector layer meta */
+  .inspector-layer-meta {
+    @apply font-mono text-[10px] text-muted-foreground;
+  }
+
+  /* Smooth transitions for interactive elements */
+  .card,
+  .inspector-layer-row,
+  .metric-card-item,
+  .split-view-metric-item {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Enhanced hover states */
+  .inspector-layer-row:hover {
+    transform: translateX(2px);
+  }
+
+  /* Typography refinements */
+  .card-title {
+    @apply text-base font-semibold tracking-tight;
+  }
+
+  .inspector-section-label {
+    @apply text-[11px] font-semibold uppercase tracking-wider;
+  }
+
+  /* Unified border radius */
+  .card,
+  .split-view-metrics,
+  .cnn-3d-viewer {
+    @apply rounded-xl;
+  }
+
+  /* Consistent shadow system */
+  .card {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+}
+
+@layer base {
+  ::-webkit-scrollbar { @apply size-2; }
+  ::-webkit-scrollbar-track { @apply bg-transparent; }
+  ::-webkit-scrollbar-thumb { @apply rounded-full bg-muted; }
+  ::-webkit-scrollbar-thumb:hover { background: oklch(0.55 0.012 260 / 0.3); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+@media (max-width: 1279px) {
+  .main-grid { grid-template-columns: 260px minmax(0, 1fr); }
+}
+
+@media (max-width: 959px) {
+  .main-grid { grid-template-columns: 1fr; }
+  .bottom-grid { grid-template-columns: 1fr; }
+  .heatmap-grid { @apply grid-cols-3; }
+}
+
+@media (max-width: 639px) {
+  .heatmap-grid { @apply grid-cols-2; }
+}
