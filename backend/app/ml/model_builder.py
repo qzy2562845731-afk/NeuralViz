@@ -178,12 +178,14 @@ class ConfigurableCNN(nn.Module):
             # 使用可配置激活函数
             if activation == "leaky_relu":
                 block.add_module(f"act{i}", act_cls(negative_slope=0.1, inplace=True))
-            elif activation in ("relu", "gelu", "silu"):
+            elif activation in ("relu", "silu", "elu"):
                 block.add_module(f"act{i}", act_cls(inplace=True))
             else:
+                # gelu, tanh, sigmoid 等不支持 inplace
                 block.add_module(f"act{i}", act_cls())
             self.conv_layers.append(block)
-            self.pool_layers.append(nn.MaxPool2d(2))
+            # 使用 ceil_mode 防止深度架构时特征图尺寸归零
+            self.pool_layers.append(nn.MaxPool2d(2, ceil_mode=True))
 
             # 注意力模块（使用工厂函数）
             attn_module = create_attention(attention, out_ch, **attn_kwargs)

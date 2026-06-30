@@ -468,11 +468,12 @@ class TrainingService:
                     amp_manager=amp_manager,
                     batch_aug=batch_aug,
                     num_classes=num_classes,
+                    loss_function=hp.get("loss_function", "cross_entropy"),
                 )
 
                 # 验证阶段
                 val_loss, val_acc, precision, recall, f1, confusion_matrix, all_preds, all_labels, all_probs, per_class_p, per_class_r, per_class_f1 = self._validate(
-                    model, val_loader, criterion, device, num_classes
+                    model, val_loader, criterion, device, num_classes, hp.get("loss_function", "cross_entropy")
                 )
 
                 # 学习率调度器更新
@@ -1111,6 +1112,7 @@ class TrainingService:
         amp_manager: Optional[AMPManager] = None,
         batch_aug: Optional[Dict[str, Any]] = None,
         num_classes: int = 10,
+        loss_function: str = "cross_entropy",
     ) -> Tuple[float, float, float]:
         """训练一个 epoch，返回 (平均loss, 准确率, 梯度范数)
 
@@ -1169,20 +1171,24 @@ class TrainingService:
 
             optimizer.zero_grad()
 
+            # 回归类损失需要 one-hot 编码 target
+            loss_name = loss_function.lower().replace("_", "").replace("-", "")
+            regression_losses = {"mse", "l1", "smoothl1", "huber", "bce", "bcewithlogits", "bceloss"}
+            if loss_name in regression_losses and not use_batch_aug:
+                y_for_loss = torch.nn.functional.one_hot(y_batch, num_classes=num_classes).float()
+            elif loss_name in regression_losses and use_batch_aug:
+                y_for_loss = y_mixed
+            else:
+                y_for_loss = y_mixed if use_batch_aug else y_batch
+
             # AMP 混合精度前向传播
             if amp_manager is not None:
                 with amp_manager.autocast_context():
                     outputs = model(X_batch)
-                    if use_batch_aug:
-                        loss = criterion(outputs, y_mixed)
-                    else:
-                        loss = criterion(outputs, y_batch)
+                    loss = criterion(outputs, y_for_loss)
             else:
                 outputs = model(X_batch)
-                if use_batch_aug:
-                    loss = criterion(outputs, y_mixed)
-                else:
-                    loss = criterion(outputs, y_batch)
+                loss = criterion(outputs, y_for_loss)
 
             # AMP-aware backward + optimizer step
             if amp_manager is not None:
@@ -1224,6 +1230,7 @@ class TrainingService:
         criterion: nn.Module,
         device: torch.device,
         num_classes: int,
+        loss_name: str = "cross_entropy",
     ) -> Tuple[float, float, float, float, float, List[List[int]], List[int], List[int], List[List[float]], List[float], List[float], List[float]]:
         """验证，返回 (val_loss, val_acc, precision, recall, f1, confusion_matrix, all_preds, all_labels, all_probs, per_class_p, per_class_r, per_class_f1)"""
         model.eval()
@@ -1235,7 +1242,14 @@ class TrainingService:
             for X_batch, y_batch in loader:
                 X_batch, y_batch = X_batch.to(device), y_batch.to(device)
                 outputs = model(X_batch)
-                loss = criterion(outputs, y_batch)
+                # 回归类损失需要 one-hot 编码 target
+                _loss_key = loss_name.lower().replace("_", "").replace("-", "") if isinstance(loss_name, str) else ""
+                regression_losses = {"mse", "l1", "smoothl1", "huber", "bce", "bcewithlogits", "bceloss"}
+                if _loss_key in regression_losses:
+                    y_val_loss = torch.nn.functional.one_hot(y_batch, num_classes=num_classes).float()
+                else:
+                    y_val_loss = y_batch
+                loss = criterion(outputs, y_val_loss)
                 total_loss += loss.item() * len(y_batch)
                 preds = outputs.argmax(dim=1)
                 all_preds.extend(preds.cpu().numpy().tolist())
