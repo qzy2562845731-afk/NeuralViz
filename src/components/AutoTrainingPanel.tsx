@@ -185,6 +185,9 @@ export function AutoTrainingPanel() {
     activation: 'relu',
   });
 
+  // 自定义通道输入
+  const [customChannelsText, setCustomChannelsText] = useState('32,64');
+
   // 超参数配置
   const [hyperparams, setHyperparams] = useState<HyperparamConfig>({
     learning_rate: 0.001,
@@ -568,11 +571,14 @@ export function AutoTrainingPanel() {
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <label className="block text-[10px] font-medium text-muted-foreground mb-1">通道配置</label>
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-1.5 flex-wrap">
                     {CHANNEL_PRESETS.map(p => (
                       <button
                         key={p.label}
-                        onClick={() => updateArch('channels', p.value)}
+                        onClick={() => {
+                          updateArch('channels', p.value);
+                          setCustomChannelsText(p.value.join(','));
+                        }}
                         className={`rounded px-2 py-1 text-[10px] font-mono transition-all ${
                           modelArch.channels.join(',') === p.value.join(',')
                             ? 'bg-primary/15 text-primary border border-primary/30'
@@ -583,6 +589,34 @@ export function AutoTrainingPanel() {
                       </button>
                     ))}
                   </div>
+                  <input
+                    type="text"
+                    value={customChannelsText}
+                    onChange={e => {
+                      setCustomChannelsText(e.target.value);
+                      const val = e.target.value.trim();
+                      if (!val) return;
+                      try {
+                        // 支持JSON格式嵌套数组：[[16,32],[32,64]]
+                        if (val.startsWith('[') && val.includes('[')) {
+                          const parsed = JSON.parse(val);
+                          if (Array.isArray(parsed) && parsed.length > 0) {
+                            updateArch('channels', parsed as any);
+                          }
+                        } else {
+                          // 逗号分隔的扁平通道：16,32,64
+                          const vals = val.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+                          if (vals.length > 0) updateArch('channels', vals);
+                        }
+                      } catch {
+                        // JSON解析失败，尝试逗号分隔
+                        const vals = val.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+                        if (vals.length > 0) updateArch('channels', vals);
+                      }
+                    }}
+                    placeholder="如 32,64 或 [[16,32],[32,64]]"
+                    className="mt-1.5 w-full rounded border border-white/[0.08] bg-white/[0.02] px-2 py-1.5 text-[10px] font-mono text-foreground focus:border-primary/40 focus:outline-none"
+                  />
                 </div>
                 <div>
                   <label className="block text-[10px] font-medium text-muted-foreground mb-1">注意力机制</label>

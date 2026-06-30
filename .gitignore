@@ -187,6 +187,10 @@ logs/
 *.log
 
 # ============================================================
+# Screenshots (project documentation only)
+# ============================================================
+screenshots/
+
 # Large media files (use Git LFS or external hosting)
 # ============================================================
 *.mp4

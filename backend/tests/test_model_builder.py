@@ -7,7 +7,7 @@ import torch
 from app.ml.model_builder import (
     build_model, count_parameters, ConfigurableCNN, ConfigurableMLP,
     SEBlock, CBAMBlock, SelfAttention2d, SimpleCNN, SimpleMLP,
-    _parse_image_shape, load_trained_model,
+    _parse_image_shape, load_trained_model, _flatten_channels,
 )
 
 
@@ -320,3 +320,57 @@ class TestCountParameters:
         cnn = ConfigurableCNN(in_channels=1, num_classes=10, channel_list=[32, 64])
         cnn_big = ConfigurableCNN(in_channels=1, num_classes=10, channel_list=[32, 64, 128, 256])
         assert count_parameters(cnn) < count_parameters(cnn_big)
+
+
+class TestFlattenChannels:
+    """测试 _flatten_channels 嵌套通道展平"""
+
+    def test_flat_list_unchanged(self):
+        """扁平列表不变"""
+        assert _flatten_channels([32, 64]) == [32, 64]
+
+    def test_single_nested(self):
+        """单层嵌套展平"""
+        assert _flatten_channels([[16, 32], [32, 64]]) == [16, 32, 32, 64]
+
+    def test_complex_nested_example(self):
+        """用户复现示例：多层嵌套二维数组"""
+        channels = [[16, 32], [32, 64], [32, 64], [64, 128], [64, 128, 256], [64, 128, 256, 512]]
+        result = _flatten_channels(channels)
+        assert result == [16, 32, 32, 64, 32, 64, 64, 128, 64, 128, 256, 64, 128, 256, 512]
+        # 验证所有元素都是 int
+        assert all(isinstance(c, int) for c in result)
+
+    def test_tuple_input(self):
+        """元组输入"""
+        assert _flatten_channels((32, 64)) == [32, 64]
+
+    def test_single_element(self):
+        """单元素列表"""
+        assert _flatten_channels([32]) == [32]
+
+    def test_float_to_int(self):
+        """浮点数转整数"""
+        assert _flatten_channels([32.0, 64.0]) == [32, 64]
+
+    def test_configurable_cnn_with_nested_channels(self, sample_image_tensors):
+        """ConfigurableCNN 接受嵌套通道配置"""
+        X, y = sample_image_tensors
+        model = ConfigurableCNN(
+            in_channels=1, num_classes=10,
+            channel_list=[[16, 32], [32, 64]],
+        )
+        model.eval()
+        with torch.no_grad():
+            output = model(X[:4])
+        assert output.shape == (4, 10)
+        # 验证展平后的通道数
+        assert model.channel_list == [16, 32, 32, 64]
+
+    def test_build_model_with_nested_channels(self):
+        """build_model 接受嵌套通道配置"""
+        model = build_model("mnist_idx", "1x28x28", 10, {
+            "channels": [[16, 32], [32, 64]],
+        })
+        assert isinstance(model, ConfigurableCNN)
+        assert model.channel_list == [16, 32, 32, 64]

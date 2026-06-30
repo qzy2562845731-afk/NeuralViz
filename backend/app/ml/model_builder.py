@@ -11,6 +11,31 @@ from typing import Tuple, Optional, Dict, Any, List
 from app.ml.attention import create_attention, ATTENTION_REGISTRY
 
 
+def _flatten_channels(channels) -> List[int]:
+    """递归展平嵌套的通道配置列表，支持嵌套二维数组格式
+
+    例如：
+    - [32, 64] -> [32, 64]
+    - [[16, 32], [32, 64]] -> [16, 32, 32, 64]
+    - [[16,32],[32,64],[64,128,256]] -> [16, 32, 32, 64, 64, 128, 256]
+    """
+    result = []
+    for item in channels:
+        if isinstance(item, (list, tuple)):
+            result.extend(_flatten_channels(item))
+        elif isinstance(item, (int, float)):
+            result.append(int(item))
+        else:
+            # 尝试转换字符串等
+            try:
+                result.append(int(item))
+            except (ValueError, TypeError):
+                raise ValueError(f"通道配置中包含无法解析的值: {item}")
+    if not result:
+        raise ValueError(f"通道配置展平后为空: {channels}")
+    return result
+
+
 def _parse_image_shape(feature_shape) -> Tuple[int, int, int]:
     """解析图像特征形状为 (channels, height, width)
     
@@ -109,9 +134,12 @@ class ConfigurableCNN(nn.Module):
         if channel_list is None:
             channel_list = [32, 64]
 
+        # 展平嵌套的通道配置（支持 [[16,32],[32,64]] 等嵌套二维数组格式）
+        channel_list = _flatten_channels(channel_list)
+
         # 输入验证
-        if not isinstance(channel_list, (list, tuple)) or len(channel_list) == 0:
-            raise ValueError(f"channel_list 必须是非空列表，当前值: {channel_list}")
+        if len(channel_list) == 0:
+            raise ValueError(f"channel_list 展平后为空")
         for i, ch in enumerate(channel_list):
             if not isinstance(ch, int) or ch <= 0:
                 raise ValueError(f"channel_list[{i}] 必须是正整数，当前值: {ch}")

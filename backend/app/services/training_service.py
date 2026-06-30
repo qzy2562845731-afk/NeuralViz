@@ -26,7 +26,7 @@ from app.core.config import settings
 from app.models.experiment import Experiment
 from app.models.experiment_metric import ExperimentMetric
 from app.services.dataset_service import DatasetService
-from app.ml.model_builder import build_model, count_parameters, ConfigurableCNN, ConfigurableMLP
+from app.ml.model_builder import build_model, count_parameters, ConfigurableCNN, ConfigurableMLP, _flatten_channels
 from app.ml.attention import SEBlock, CBAMBlock, SelfAttention2d
 from app.ml.losses import create_loss_function, list_loss_functions
 from app.ml.augmentation import (
@@ -774,10 +774,10 @@ class TrainingService:
             "fc_hidden": mc.get("fc_hidden", config.get("fc_hidden", 128)),
             "use_attention": mc.get("use_attention", config.get("use_attention", False)),
         }
-        # 确保 channels 是 list[int]
+        # 确保 channels 是 list[int]，支持嵌套二维数组格式
         if not isinstance(model_config["channels"], (list, tuple)):
             model_config["channels"] = [32, 64]
-        model_config["channels"] = [int(c) for c in model_config["channels"]]
+        model_config["channels"] = _flatten_channels(model_config["channels"])
         # 类型校验
         model_config["use_bn"] = bool(model_config["use_bn"])
         model_config["use_dropout"] = bool(model_config["use_dropout"])
