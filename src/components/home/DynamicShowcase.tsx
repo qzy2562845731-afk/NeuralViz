@@ -13,11 +13,7 @@ import { CustomModelShowcase } from './showcase/CustomModelShowcase';
    ============================================ */
 
 /* 各 Tab 的入场动画变体 */
-const tabVariants: Record<string, {
-  initial: object;
-  animate: object;
-  exit: object;
-}> = {
+const tabVariants = {
   overview: {
     initial: { opacity: 0, scale: 0.96 },
     animate: { opacity: 1, scale: 1 },
@@ -48,7 +44,7 @@ const tabVariants: Record<string, {
     animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
     exit: { opacity: 0, filter: 'blur(6px)' },
   },
-};
+} as const;
 
 /* 面板注册表 */
 const SHOWCASE_MAP: Record<string, React.ComponentType> = {
@@ -66,7 +62,7 @@ interface DynamicShowcaseProps {
 
 export function DynamicShowcase({ activeTab }: DynamicShowcaseProps) {
   const PanelComponent = SHOWCASE_MAP[activeTab] ?? OverviewShowcase;
-  const variants = tabVariants[activeTab] ?? tabVariants.overview;
+  const variants = tabVariants[activeTab as keyof typeof tabVariants] ?? tabVariants.overview;
 
   return (
     <section id="showcase" className="relative min-h-[70vh] rounded-b-3xl">

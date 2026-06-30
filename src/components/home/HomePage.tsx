@@ -21,9 +21,8 @@ export function HomePage() {
 
   return (
     <div className="min-h-screen text-foreground antialiased">
-      {/* 动态视频背景（视频文件放在 public/videos/background.mp4） */}
+      {/* 动态视频背景 — 视频文件需自行放置在 public/videos/ 目录下 */}
       <VideoBackground
-        src="/videos/18333010-uhd_3840_2160_25fps.mp4"
         overlayOpacity={0.55}
         fallback={<NeuralNetworkBackground />}
       />
