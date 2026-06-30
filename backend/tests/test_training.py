@@ -186,7 +186,14 @@ class TestLRIntegration:
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10)
 
         initial_lr = optimizer.param_groups[0]["lr"]
+        # 模拟一个训练step：forward + backward + optimizer.step + scheduler.step
+        dummy_input = torch.randn(1, 1, 28, 28)
+        dummy_target = torch.randint(0, 3, (1,))
         for _ in range(5):
+            optimizer.zero_grad()
+            loss = torch.nn.functional.cross_entropy(model(dummy_input), dummy_target)
+            loss.backward()
+            optimizer.step()
             scheduler.step()
 
         final_lr = optimizer.param_groups[0]["lr"]

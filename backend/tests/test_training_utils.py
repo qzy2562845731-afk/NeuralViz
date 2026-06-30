@@ -87,7 +87,13 @@ class TestCheckpointManager:
         mgr.save(model, optimizer, epoch=5, best_val_acc=0.9, best_epoch=5, scheduler=scheduler)
         assert mgr.exists()
 
-        # 修改 scheduler 状态
+        # 模拟一个训练step后修改 scheduler 状态
+        dummy_input = torch.randn(1, 10)
+        dummy_target = torch.randn(1, 5)  # 模型输出维度为5
+        optimizer.zero_grad()
+        loss = torch.nn.functional.mse_loss(model(dummy_input), dummy_target)
+        loss.backward()
+        optimizer.step()
         scheduler.step()
 
         # 加载恢复
@@ -180,6 +186,13 @@ class TestCreateScheduler:
         scheduler, s_type = create_scheduler(optimizer, "cosine", total_epochs=20)
         assert scheduler is not None
         assert s_type == "cosine_annealing"
+        # 模拟训练step后再调用scheduler.step()
+        dummy_input = torch.randn(1, 10)
+        dummy_target = torch.randn(1, 5)
+        optimizer.zero_grad()
+        loss = torch.nn.functional.cross_entropy(model(dummy_input), dummy_target)
+        loss.backward()
+        optimizer.step()
         scheduler.step()
         assert optimizer.param_groups[0]["lr"] < 0.1
 

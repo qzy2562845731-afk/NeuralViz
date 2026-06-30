@@ -205,7 +205,13 @@ class TestCreateLossFunction:
         for name in LOSS_REGISTRY:
             try:
                 criterion = create_loss_function(name)
-                val = criterion(preds, targets)
+                # 根据损失函数类型匹配正确输入形状
+                # MSE/L1 损失期望 targets 和 preds 形状相同
+                if name in ["mse", "l1", "smooth_l1"]:
+                    targets_expanded = preds.clone()
+                else:
+                    targets_expanded = targets
+                val = criterion(preds, targets_expanded)
                 assert val.item() >= 0, f"{name} 返回负值"
             except Exception as e:
                 # 某些损失函数对输入格式有特殊要求，跳过即可

@@ -1,0 +1,13 @@
+# NeuralViz Backend - 开发依赖
+# 安装: pip install -r requirements-dev.txt
+
+# 测试框架
+pytest>=9.0
+pytest-asyncio>=0.25
+pytest-cov>=6.0
+httpx>=0.28
+
+# 代码质量
+ruff>=0.8
+black>=24.0
+mypy>=1.14
