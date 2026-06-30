@@ -82,6 +82,7 @@ function WorkbenchLayout() {
     trainingError,
     elapsedSeconds,
     data: trainingDataList,
+    trainingLogs,
     backendStatus,
     hasActiveTraining,
   } = useGlobalTraining();
@@ -567,6 +568,8 @@ function WorkbenchLayout() {
             }
             totalEpochs={totalEpochs}
             hyperparams={hyperparams}
+            trainingHistory={trainingDataList}
+            trainingLogs={trainingLogs}
           />
         </div>
 

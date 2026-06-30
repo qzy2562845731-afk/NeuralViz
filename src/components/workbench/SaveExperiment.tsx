@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { apiService } from '../../services/api';
+import type { TrainingStepData } from '../../types/training';
 
 interface SaveExperimentProps {
   modelId: string | null;
@@ -13,6 +14,8 @@ interface SaveExperimentProps {
   trainingStatus?: string;
   totalEpochs?: number;
   hyperparams?: Record<string, any>;
+  trainingHistory?: TrainingStepData[];
+  trainingLogs?: string[];
   onSaved?: (experimentId: string) => void;
 }
 
@@ -28,6 +31,8 @@ export function SaveExperiment({
   trainingStatus = 'draft',
   totalEpochs = 0,
   hyperparams,
+  trainingHistory,
+  trainingLogs,
   onSaved,
 }: SaveExperimentProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -71,7 +76,9 @@ export function SaveExperiment({
           batch_size: 32,
           optimizer: 'adam',
         },
-        config: {},
+        config: {
+          training_logs: trainingLogs || [],
+        },
         tags: tagList,
         total_params: totalParams,
         layer_count: layerCount,
@@ -82,9 +89,36 @@ export function SaveExperiment({
         total_epochs: totalEpochs || currentStep,
       });
 
+      // 批量保存训练指标到 experiment_metrics 表
+      const experimentId = res.data.experiment_id;
+      if (trainingHistory && trainingHistory.length > 0) {
+        try {
+          const metrics = trainingHistory.map((h) => ({
+            step: h.step,
+            epoch: h.step,
+            loss: h.trainLoss ?? h.loss ?? 0,
+            accuracy: h.trainAccuracy ?? h.accuracy ?? 0,
+            val_loss: h.valLoss ?? 0,
+            val_accuracy: h.valAccuracy ?? 0,
+            learning_rate: h.learningRate ?? 0,
+            metric_type: 'training',
+            extra_data: {
+              precision: h.precision ?? 0,
+              recall: h.recall ?? 0,
+              f1: h.f1Score ?? 0,
+              gradient_norm: h.gradientNorm ?? 0,
+              weight_norm: h.weightNorm ?? 0,
+            },
+          }));
+          await apiService.addExperimentMetrics(experimentId, metrics);
+        } catch (metricsErr) {
+          console.warn('保存训练指标失败，但实验已创建:', metricsErr);
+        }
+      }
+
       setIsOpen(false);
       if (onSaved) {
-        onSaved(res.data.experiment_id);
+        onSaved(experimentId);
       }
     } catch (err: any) {
       setError(err.message || '保存失败');
