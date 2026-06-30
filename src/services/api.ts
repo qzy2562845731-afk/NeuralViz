@@ -242,7 +242,7 @@ export interface TrainingMetricsData {
 /* 模型配置结构（CNN架构参数） */
 export interface ModelConfig {
   channels: number[];
-  attention: boolean;
+  attention: string;
   use_bn: boolean;
   use_dropout: boolean;
   dropout_rate: number;

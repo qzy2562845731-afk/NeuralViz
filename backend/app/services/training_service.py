@@ -762,9 +762,16 @@ class TrainingService:
         mc = config.get("model_config", {}) or {}
         # 也支持从 config 根级别读取（消融实验字段）
         channels = mc.get("channel_list") or mc.get("channels") or config.get("channels") or [32, 64]
+
+        # attention 字段可能被前端误传为布尔值，需要兼容处理
+        attention_val = mc.get("attention", config.get("attention", "none"))
+        if isinstance(attention_val, bool):
+            # 布尔值：True 时查找 attention_type，否则 none
+            attention_val = mc.get("attention_type", config.get("attention_type", "se")) if attention_val else "none"
+
         model_config = {
             "channels": channels,
-            "attention": mc.get("attention", config.get("attention", "none")),
+            "attention": attention_val,
             "activation": mc.get("activation", config.get("activation", "relu")),
             "attention_kwargs": mc.get("attention_kwargs", config.get("attention_kwargs")),
             "use_bn": mc.get("use_bn", config.get("use_bn", True)),
@@ -784,7 +791,17 @@ class TrainingService:
         model_config["use_residual"] = bool(model_config["use_residual"])
         model_config["use_attention"] = bool(model_config["use_attention"])
         model_config["dropout_rate"] = float(model_config["dropout_rate"])
-        model_config["fc_hidden"] = int(model_config["fc_hidden"])
+        # fc_hidden 支持列表/嵌套列表格式（如 [128]、[128,64]、[[128]]），递归提取第一个 int 值
+        def _extract_int(val):
+            if isinstance(val, (list, tuple)):
+                for v in val:
+                    try:
+                        return _extract_int(v)
+                    except (ValueError, TypeError):
+                        continue
+                return 128
+            return int(val)
+        model_config["fc_hidden"] = _extract_int(model_config["fc_hidden"])
         return model_config
 
     # ============================================================

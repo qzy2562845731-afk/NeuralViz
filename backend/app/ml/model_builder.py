@@ -149,6 +149,11 @@ class ConfigurableCNN(nn.Module):
             raise ValueError(f"num_classes 必须是正整数，当前值: {num_classes}")
 
         self.channel_list = list(channel_list)
+        # attention 归一化：布尔值转为字符串类型
+        if isinstance(attention, bool):
+            attention = "se" if attention else "none"
+        elif attention is None:
+            attention = "none"
         self.attention_type = attention
         self.use_residual = use_residual
 

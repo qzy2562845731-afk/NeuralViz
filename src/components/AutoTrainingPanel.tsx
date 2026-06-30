@@ -279,8 +279,7 @@ export function AutoTrainingPanel() {
           feature_shape: selectedDataset.feature_shape,
           model_config: {
             channels: modelArch.channels,
-            attention: modelArch.attention !== 'none',
-            attention_type: modelArch.attention,
+            attention: modelArch.attention,
             use_attention: modelArch.attention !== 'none',
             use_bn: modelArch.use_bn,
             use_dropout: modelArch.use_dropout,
@@ -305,8 +304,7 @@ export function AutoTrainingPanel() {
 
       const success = await startRealTraining(expId, selectedDataset.dataset_id, { ...hyperparams }, {
         channels: modelArch.channels,
-        attention: modelArch.attention !== 'none',
-        attention_type: modelArch.attention,
+        attention: modelArch.attention,
         use_attention: modelArch.attention !== 'none',
         use_bn: modelArch.use_bn,
         use_dropout: modelArch.use_dropout,

@@ -275,6 +275,14 @@ def create_attention(attention_type: str, channels: int, **kwargs) -> nn.Module:
     if attention_type == "none" or attention_type is None:
         return None
 
+    # 防御性处理：布尔值或其他非字符串类型
+    if isinstance(attention_type, bool):
+        attention_type = "se" if attention_type else "none"
+        if attention_type == "none":
+            return None
+    elif not isinstance(attention_type, str):
+        attention_type = str(attention_type)
+
     cls = ATTENTION_REGISTRY.get(attention_type)
     if cls is None:
         raise ValueError(f"不支持的注意力类型: {attention_type}，支持: {list(ATTENTION_REGISTRY.keys())}")
