@@ -63,6 +63,8 @@ interface GlobalTrainingState {
   trainingError: string | null;
   // 已运行秒数
   elapsedSeconds: number;
+  // 训练实验ID（用于保存实验时复制完整指标）
+  trainingExperimentId: string | null;
 }
 
 interface GlobalTrainingActions {
@@ -319,6 +321,7 @@ export function GlobalTrainingProvider({ children }: GlobalTrainingProviderProps
     trainingLogs: realTraining.logs,
     trainingError: realTraining.error,
     elapsedSeconds: realTraining.elapsedSeconds,
+    trainingExperimentId: realTraining.experimentId,
     // Actions
     play,
     pause,

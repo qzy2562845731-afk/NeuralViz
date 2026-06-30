@@ -16,6 +16,7 @@ interface SaveExperimentProps {
   hyperparams?: Record<string, any>;
   trainingHistory?: TrainingStepData[];
   trainingLogs?: string[];
+  trainingExperimentId?: string | null;
   onSaved?: (experimentId: string) => void;
 }
 
@@ -33,6 +34,7 @@ export function SaveExperiment({
   hyperparams,
   trainingHistory,
   trainingLogs,
+  trainingExperimentId,
   onSaved,
 }: SaveExperimentProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,6 +67,19 @@ export function SaveExperiment({
         .map((t) => t.trim())
         .filter(Boolean);
 
+      // 如果有训练实验ID，优先从训练实验获取完整数据（logs + config）
+      let fullTrainingLogs = trainingLogs || [];
+      if (trainingExperimentId) {
+        try {
+          const trainDetailRes = await apiService.getExperimentDetail(trainingExperimentId);
+          if (trainDetailRes.code === 200 && trainDetailRes.data?.training_logs?.length > 0) {
+            fullTrainingLogs = trainDetailRes.data.training_logs;
+          }
+        } catch {
+          // 使用前端已有的 logs
+        }
+      }
+
       const res = await apiService.createExperiment({
         name: name.trim(),
         description: description.trim(),
@@ -77,7 +92,7 @@ export function SaveExperiment({
           optimizer: 'adam',
         },
         config: {
-          training_logs: trainingLogs || [],
+          training_logs: fullTrainingLogs,
         },
         tags: tagList,
         total_params: totalParams,
@@ -91,7 +106,35 @@ export function SaveExperiment({
 
       // 批量保存训练指标到 experiment_metrics 表
       const experimentId = res.data.experiment_id;
-      if (trainingHistory && trainingHistory.length > 0) {
+
+      // 优先从训练实验复制完整 metrics（含 confusion_matrix/ROC/PR/per_class_*）
+      let metricsSaved = false;
+      if (trainingExperimentId) {
+        try {
+          const metricsRes = await apiService.getExperimentMetrics(trainingExperimentId, { limit: 1000 });
+          if (metricsRes.code === 200 && metricsRes.data?.metrics?.length > 0) {
+            // 直接复制完整 metrics（包含 extra_data 中的所有字段）
+            const fullMetrics = metricsRes.data.metrics.map((m) => ({
+              step: m.step,
+              epoch: m.epoch,
+              loss: m.loss,
+              accuracy: m.accuracy,
+              val_loss: m.val_loss,
+              val_accuracy: m.val_accuracy,
+              learning_rate: m.learning_rate,
+              metric_type: m.metric_type || 'training',
+              extra_data: m.extra_data,
+            }));
+            await apiService.addExperimentMetrics(experimentId, fullMetrics);
+            metricsSaved = true;
+          }
+        } catch (copyErr) {
+          console.warn('从训练实验复制指标失败，尝试使用前端数据:', copyErr);
+        }
+      }
+
+      // 如果没有训练实验ID或复制失败，使用前端 trainingHistory 数据
+      if (!metricsSaved && trainingHistory && trainingHistory.length > 0) {
         try {
           const metrics = trainingHistory.map((h) => ({
             step: h.step,
@@ -108,6 +151,8 @@ export function SaveExperiment({
               f1: h.f1Score ?? 0,
               gradient_norm: h.gradientNorm ?? 0,
               weight_norm: h.weightNorm ?? 0,
+              confusion_matrix: h.confusionMatrix || [],
+              prediction_distribution: h.predictionDistribution || [],
             },
           }));
           await apiService.addExperimentMetrics(experimentId, metrics);

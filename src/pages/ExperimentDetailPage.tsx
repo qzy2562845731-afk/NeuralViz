@@ -22,6 +22,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   running: { label: '训练中', color: 'bg-blue-400/20 text-blue-400' },
   completed: { label: '已完成', color: 'bg-emerald-400/20 text-emerald-400' },
   failed: { label: '失败', color: 'bg-red-400/20 text-red-400' },
+  stopped: { label: '已停止', color: 'bg-amber-400/20 text-amber-400' },
   paused: { label: '已暂停', color: 'bg-amber-400/20 text-amber-400' },
 };
 
@@ -150,19 +151,22 @@ export default function ExperimentDetailPage() {
 
   // 获取ROC/PR数据（从metrics中提取）
   useEffect(() => {
-    if (!id || !detail || detail.status !== 'completed') return;
+    if (!id || !detail || !['completed', 'stopped', 'failed'].includes(detail.status)) return;
     const fetchRocPr = async () => {
       try {
         const res = await apiService.getExperimentMetrics(id, { limit: 100 });
         if (res.code === 200 && res.data.metrics?.length > 0) {
-          const lastMetric = res.data.metrics[res.data.metrics.length - 1];
-          const extra = lastMetric.extra_data;
-          if (extra && (extra.roc_curve || extra.pr_curve)) {
-            setRocPrData({
-              roc: extra.roc_curve,
-              pr: extra.pr_curve,
-              macro_auc: extra.roc_curve?.macro_auc,
-            });
+          // 从后往前扫描，找到包含 roc_curve 或 pr_curve 的 metric
+          for (let i = res.data.metrics.length - 1; i >= 0; i--) {
+            const extra = res.data.metrics[i].extra_data;
+            if (extra && (extra.roc_curve || extra.pr_curve)) {
+              setRocPrData({
+                roc: extra.roc_curve,
+                pr: extra.pr_curve,
+                macro_auc: extra.roc_curve?.macro_auc,
+              });
+              return;
+            }
           }
         }
       } catch {}
