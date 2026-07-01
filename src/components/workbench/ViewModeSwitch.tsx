@@ -67,6 +67,24 @@ const MODES: Array<{
     text: 'text-amber-200',
     description: '热图映射参数规模：蓝→青→黄→红，参数越多亮度越高。',
   },
+  {
+    id: 'feature',
+    shortName: '特征图',
+    fullName: '特征图视图',
+    icon: (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="3" y="3" width="7" height="7" />
+        <rect x="14" y="3" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" />
+        <rect x="14" y="14" width="7" height="7" />
+      </svg>
+    ),
+    gradient: 'from-purple-500/60 via-cyan-400/60 to-pink-500/60',
+    activeGradient: 'from-purple-500 via-cyan-400 to-pink-500',
+    ring: 'ring-purple-400/40',
+    text: 'text-purple-200',
+    description: '显示CNN特征图、卷积核权重和注意力分布的热力图纹理。',
+  },
 ];
 
 export function ViewModeSwitch() {

@@ -29,7 +29,7 @@ export interface NetworkArchitecture {
 }
 
 /* ---------- 3D 视图模式 ---------- */
-export type ViewMode = 'structure' | 'activation' | 'parameter';
+export type ViewMode = 'structure' | 'activation' | 'parameter' | 'feature';
 
 /* ---------- 视图模式说明 ---------- */
 export const VIEW_MODES: Array<{ id: ViewMode; name: string; description: string; icon: string
@@ -37,6 +37,7 @@ export const VIEW_MODES: Array<{ id: ViewMode; name: string; description: string
   { id: 'structure', name: '结构视图', description: '显示网络结构和形状', icon: '◈' },
   { id: 'activation', name: '激活视图', description: '显示激活强度热力图', icon: '✦' },
   { id: 'parameter', name: '参数视图', description: '显示参数分布', icon: '◉' },
+  { id: 'feature', name: '特征图视图', description: '显示CNN特征图/卷积核/注意力', icon: '◈' },
 ];
 
 /* ---------- 各层类型的颜色编码 ---------- */

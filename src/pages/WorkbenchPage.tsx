@@ -140,6 +140,48 @@ function WorkbenchLayout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendStatus]);
 
+  // 3D 特征图可视化数据：训练完成或切换实验时自动获取
+  const [visData, setVisData] = useState<{
+    featureMaps?: Record<string, number[][][]> | null;
+    convKernels?: Record<string, number[][]> | null;
+    attentionWeights?: number[] | null;
+  }>({});
+
+  const visExperimentId = trainingExperimentId || currentExperimentId;
+
+  useEffect(() => {
+    if (!visExperimentId) {
+      setVisData({});
+      return;
+    }
+    // 训练完成/停止/失败 或 切换实验时获取可视化数据
+    const shouldFetch = ['completed', 'stopped', 'failed'].includes(backendStatus) || backendStatus === '';
+    if (!shouldFetch) return;
+
+    let cancelled = false;
+    const fetchVis = async () => {
+      try {
+        const res = await apiService.getVisualizations(visExperimentId!);
+        if (cancelled || res.code !== 200) return;
+        const d = res.data as any;
+        if (d?.available !== false) {
+          setVisData({
+            featureMaps: d.feature_maps || null,
+            convKernels: d.conv_kernels || d.kernels || null,
+            attentionWeights: d.attention || d.attention_weights || null,
+          });
+        } else {
+          setVisData({});
+        }
+      } catch {
+        // 静默失败
+      }
+    };
+    fetchVis();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visExperimentId, backendStatus]);
+
   // 体验优化：空格键播放/暂停训练
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -643,6 +685,9 @@ function WorkbenchLayout() {
               onLayerSelect={selectLayer}
               architecture={architecture}
               viewMode={viewMode}
+              featureMaps={visData.featureMaps}
+              convKernels={visData.convKernels}
+              attentionWeights={visData.attentionWeights}
             />
           </div>
 

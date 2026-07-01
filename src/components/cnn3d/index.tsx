@@ -37,6 +37,75 @@ interface CNN3DViewerProps {
   architecture?: NetworkArchitecture;
   viewMode?: ViewMode;
   onViewModeChange?: (mode: ViewMode) => void;
+  // CNN 可视化数据
+  featureMaps?: Record<string, number[][][]> | null; // 每层多通道特征图
+  convKernels?: Record<string, number[][]> | null;   // 每层卷积核权重
+  attentionWeights?: number[] | null;                 // 注意力权重
+}
+
+/* ---------- 特征图纹理创建 ---------- */
+// jet 色彩映射：0→蓝, 0.25→青, 0.5→绿, 0.75→黄, 1→红
+function jetColor(t: number): string {
+  t = Math.max(0, Math.min(1, t));
+  let r: number, g: number, b: number;
+  if (t < 0.125) { r = 0; g = 0; b = 0.5 + t * 4; }
+  else if (t < 0.375) { r = 0; g = (t - 0.125) * 4; b = 1; }
+  else if (t < 0.625) { r = (t - 0.375) * 4; g = 1; b = 1 - (t - 0.375) * 4; }
+  else if (t < 0.875) { r = 1; g = 1 - (t - 0.625) * 4; b = 0; }
+  else { r = 1 - (t - 0.875) * 4; g = 0; b = 0; }
+  return `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
+}
+
+// 从 2D number[][] 创建热力图 CanvasTexture
+function createHeatmapTexture(data: number[][]): THREE.CanvasTexture | null {
+  if (!data || data.length === 0 || !data[0] || data[0].length === 0) return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  const h = data.length;
+  const w = data[0].length;
+  const cellW = canvas.width / w;
+  const cellH = canvas.height / h;
+  // 找最大最小值归一化
+  let minV = Infinity, maxV = -Infinity;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    minV = Math.min(minV, data[y][x]);
+    maxV = Math.max(maxV, data[y][x]);
+  }
+  const range = maxV - minV || 1;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const val = (data[y][x] - minV) / range;
+      ctx.fillStyle = jetColor(val);
+      ctx.fillRect(x * cellW, y * cellH, cellW + 1, cellH + 1);
+    }
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  return texture;
+}
+
+// 从 1D number[] 创建注意力权重热力条
+function createAttentionTexture(weights: number[]): THREE.CanvasTexture | null {
+  if (!weights || weights.length === 0) return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 16;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  const n = weights.length;
+  const cellW = canvas.width / n;
+  let maxV = Math.max(...weights, 0.001);
+  for (let i = 0; i < n; i++) {
+    const val = weights[i] / maxV;
+    ctx.fillStyle = jetColor(val);
+    ctx.fillRect(i * cellW, 0, cellW + 1, canvas.height);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  return texture;
 }
 
 /* ---------- 视图模式颜色映射 ---------- */
@@ -198,6 +267,9 @@ export function CNN3DViewer({
   onLayerHover,
   architecture = DEFAULT_ARCHITECTURE,
   viewMode = 'structure',
+  featureMaps = null,
+  convKernels = null,
+  attentionWeights = null,
 }: CNN3DViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -213,6 +285,14 @@ export function CNN3DViewer({
   const particlesRef = useRef<THREE.Points | null>(null);
   const particlePositionsRef = useRef<Float32Array>(new Float32Array(0));
   const layerPositionsRef = useRef<Map<string, THREE.Vector3>>(new Map());
+  // 特征图纹理平面存储
+  const featurePlaneGroupsRef = useRef<Map<string, THREE.Group>>(new Map());
+  const featureMapsRef = useRef<typeof featureMaps>(featureMaps);
+  featureMapsRef.current = featureMaps;
+  const convKernelsRef = useRef<typeof convKernels>(convKernels);
+  convKernelsRef.current = convKernels;
+  const attentionWeightsRef = useRef<typeof attentionWeights>(attentionWeights);
+  attentionWeightsRef.current = attentionWeights;
 
   const [initStatus, setInitStatus] = useState<'pending' | 'success' | 'error'>('pending');
   const [hoveredLayerName, setHoveredLayerName] = useState<string | null>(null);
@@ -973,6 +1053,172 @@ export function CNN3DViewer({
       });
     });
   }, [viewMode, activations, realActivations, layers]);
+
+  /* ---------- 特征图/卷积核/注意力 3D 渲染 ---------- */
+  useEffect(() => {
+    if (!sceneRef.current) return;
+
+    // 清除旧的特征图平面
+    featurePlaneGroupsRef.current.forEach((group) => {
+      sceneRef.current?.remove(group);
+      group.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry?.dispose();
+          if (child.material instanceof THREE.Material) {
+            if ((child.material as THREE.MeshBasicMaterial).map) {
+              (child.material as THREE.MeshBasicMaterial).map?.dispose();
+            }
+            child.material.dispose();
+          }
+        }
+      });
+    });
+    featurePlaneGroupsRef.current.clear();
+
+    const fm = featureMapsRef.current;
+    const ck = convKernelsRef.current;
+    const aw = attentionWeightsRef.current;
+    const hasVisData = (fm && Object.keys(fm).length > 0) || (ck && Object.keys(ck).length > 0) || (aw && aw.length > 0);
+    if (!hasVisData) return;
+
+    // 为每个卷积层创建特征图平面
+    layers.forEach((layer) => {
+      if (layer.type !== 'conv') return;
+      const pos = layerPositionsRef.current.get(layer.id);
+      if (!pos) return;
+
+      // 尝试匹配特征图数据（支持 conv1, layer_0 等命名）
+      const fmKeys = fm ? Object.keys(fm) : [];
+      const matchedKey = fmKeys.find((k) =>
+        k === layer.id || k === layer.name ||
+        layer.id.includes(k) || k.includes(layer.id) ||
+        k === `conv${layer.id.replace(/\D/g, '')}`
+      );
+      const layerFm = matchedKey ? fm![matchedKey] : null;
+
+      // 匹配卷积核
+      const ckKeys = ck ? Object.keys(ck) : [];
+      const matchedCkKey = ckKeys.find((k) =>
+        k === layer.id || k === layer.name ||
+        layer.id.includes(k) || k.includes(layer.id) ||
+        k === `conv${layer.id.replace(/\D/g, '')}`
+      );
+      const layerCk = matchedCkKey ? ck![matchedCkKey] : null;
+
+      if (!layerFm && !layerCk) return;
+
+      const group = new THREE.Group();
+      const planeSize = 2.0;
+      const planeSpacing = 0.15;
+
+      // 渲染前 4 个通道的特征图
+      if (layerFm && Array.isArray(layerFm)) {
+        const numChannels = Math.min(layerFm.length, 4);
+        for (let c = 0; c < numChannels; c++) {
+          const channelData = layerFm[c];
+          if (!Array.isArray(channelData) || channelData.length === 0) continue;
+          const tex = createHeatmapTexture(channelData);
+          if (!tex) continue;
+          const geo = new THREE.PlaneGeometry(planeSize, planeSize);
+          const mat = new THREE.MeshBasicMaterial({
+            map: tex,
+            transparent: true,
+            opacity: 0.95,
+            side: THREE.DoubleSide,
+          });
+          const plane = new THREE.Mesh(geo, mat);
+          // 堆叠在卷积层上方，沿 Z 轴排列
+          plane.position.set(
+            pos.x,
+            pos.y + 2.0 + c * planeSpacing,
+            pos.z
+          );
+          plane.rotation.x = -0.3;
+          group.add(plane);
+        }
+        // 添加标签
+        const labelSprite = createSpriteLabel(
+          `${matchedKey || layer.id} 特征图 (${numChannels}ch)`,
+          undefined,
+          '#78c8ff'
+        );
+        labelSprite.position.set(pos.x, pos.y + 2.0 + numChannels * planeSpacing + 0.3, pos.z);
+        labelSprite.scale.set(2.5, 0.4, 1);
+        group.add(labelSprite);
+      }
+
+      // 渲染卷积核权重
+      if (layerCk && Array.isArray(layerCk) && layerCk.length > 0) {
+        // 取第一个卷积核的权重（1D 数组），重塑为近似正方形
+        const flatKernel = Array.isArray(layerCk[0]) ? layerCk[0] : (layerCk as unknown as number[]);
+        const total = flatKernel.length;
+        const side = Math.ceil(Math.sqrt(total));
+        const kernel2d: number[][] = [];
+        for (let r = 0; r < side; r++) {
+          const row: number[] = [];
+          for (let c = 0; c < side; c++) {
+            row.push(r * side + c < total ? flatKernel[r * side + c] : 0);
+          }
+          kernel2d.push(row);
+        }
+        const tex = createHeatmapTexture(kernel2d);
+        if (tex) {
+          const geo = new THREE.PlaneGeometry(planeSize * 0.6, planeSize * 0.6);
+          const mat = new THREE.MeshBasicMaterial({
+            map: tex,
+            transparent: true,
+            opacity: 0.9,
+            side: THREE.DoubleSide,
+          });
+          const plane = new THREE.Mesh(geo, mat);
+          plane.position.set(pos.x, pos.y - 2.0, pos.z);
+          plane.rotation.x = 0.3;
+          group.add(plane);
+
+          const labelSprite = createSpriteLabel(
+            `${matchedCkKey || layer.id} 卷积核`,
+            undefined,
+            '#ffc878'
+          );
+          labelSprite.position.set(pos.x, pos.y - 2.0 - 0.3, pos.z);
+          labelSprite.scale.set(2.2, 0.35, 1);
+          group.add(labelSprite);
+        }
+      }
+
+      // 注意力权重（如果有）
+      if (aw && aw.length > 0 && layer.id.toLowerCase().includes('conv')) {
+        // 仅在第一个卷积层显示一次注意力
+        const convLayers = layers.filter((l) => l.type === 'conv');
+        if (convLayers[0]?.id === layer.id) {
+          const attTex = createAttentionTexture(aw);
+          if (attTex) {
+            const geo = new THREE.PlaneGeometry(planeSize * 1.5, planeSize * 0.2);
+            const mat = new THREE.MeshBasicMaterial({
+              map: attTex,
+              transparent: true,
+              opacity: 0.95,
+              side: THREE.DoubleSide,
+            });
+            const plane = new THREE.Mesh(geo, mat);
+            plane.position.set(pos.x, pos.y, pos.z + 2.0);
+            group.add(plane);
+
+            const labelSprite = createSpriteLabel('注意力权重', undefined, '#ff96c8');
+            labelSprite.position.set(pos.x, pos.y + 0.3, pos.z + 2.0);
+            labelSprite.scale.set(1.8, 0.3, 1);
+            group.add(labelSprite);
+          }
+        }
+      }
+
+      if (group.children.length > 0) {
+        group.visible = (viewMode === 'feature');
+        sceneRef.current?.add(group);
+        featurePlaneGroupsRef.current.set(layer.id, group);
+      }
+    });
+  }, [featureMaps, convKernels, attentionWeights, viewMode, layers]);
 
   /* ---------- 3D导出处理 ---------- */
   const handleExport3D = useCallback(async (format: Export3DFormat | 'screenshot') => {
